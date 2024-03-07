@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
 
     while run:
-        robot.wait_for_arduino()
+        #robot.wait_for_arduino()
         robot.setSpeed(
             left_speed=speed, 
             right_speed=speed

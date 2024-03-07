@@ -35,6 +35,9 @@ class Zomby:
         self.wait_for_arduino()
 
     def setSpeed(self, right_speed, left_speed):
+
+        self.wait_for_arduino()
+
         if right_speed > 128:
             right_speed_sat = 128
         elif right_speed < 0:
