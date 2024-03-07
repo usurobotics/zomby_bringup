@@ -35,7 +35,7 @@ class MotorControl(Node):
         left_speed = wheel_veloc.item(1)
 
         self.zomby.setSpeed(
-            right_speed=right_speed
+            right_speed=right_speed,
             left_speed=left_speed
         )
 
