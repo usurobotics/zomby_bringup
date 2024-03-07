@@ -1,4 +1,4 @@
-import zomby
+import zomby_bringup.lib.zomby as zomby
 import time as pytime
 
 if __name__ == "__main__":
