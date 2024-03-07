@@ -1,8 +1,11 @@
+"""Code for communicating to zomby's arduino via USB"""
+
 import serial
 
 DEBUG = 1
 
 class Zomby:
+    """Class for communicating to zomby's arduino via USB"""
     def wait_for_arduino(self):
 
         # waits to receive this character
