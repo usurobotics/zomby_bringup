@@ -1,3 +1,3 @@
 """Contains parameters for zomby robot"""
 
-wheel_radius = 0.3  # units: m
+WHEEL_RADIUS = 0.1778  # units: m

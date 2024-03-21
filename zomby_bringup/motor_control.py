@@ -3,7 +3,9 @@ import numpy as np
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from zomby_bringup.lib.zomby import Zomby
-import params.zomby_parameters as zomby_params
+import zomby_bringup.params.zomby_params as zomby_params
+
+DEBUG = 1
 
 class MotorControl(Node):
     def __init__(self):
@@ -21,18 +23,31 @@ class MotorControl(Node):
             qos_profile=10
         )
 
+        print("Motor Control node initialized.")
+
     def cmd_vel_cb(self, msg: Twist):
+        
+        if DEBUG:
+            print("Received command:")
+            print("\tlinear: " + str(msg.linear.x))
+            print("\tangular: " + str(msg.angular.z))
+
         cmd = np.array([[msg.linear.x],
                         [msg.angular.z]])
-        m = (zomby_params.wheel_radius/2) * np.array([[1,1],
+        m = (zomby_params.WHEEL_RADIUS/2) * np.array([[1,1],
                                                       [1,-1]])
         
         m_inv = np.linalg.inv(m)
 
         wheel_veloc = m_inv@cmd
 
-        right_speed = wheel_veloc.item(0)
-        left_speed = wheel_veloc.item(1)
+        right_speed = int(wheel_veloc.item(0))
+        left_speed = int(wheel_veloc.item(1))
+
+        if DEBUG:
+            print("Sending speeds:")
+            print("\tright: " + str(right_speed))
+            print("\tleft: " + str(left_speed))
 
         self.zomby.setSpeed(
             right_speed=right_speed,

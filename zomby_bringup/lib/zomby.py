@@ -2,7 +2,7 @@
 
 import serial
 
-DEBUG = 1
+DEBUG = 0
 
 class Zomby:
     """Class for communicating to zomby's arduino via USB"""
@@ -34,7 +34,7 @@ class Zomby:
         # Wait for arduino to be ready
         self.wait_for_arduino()
 
-    def setSpeed(self, right_speed, left_speed):
+    def setSpeed(self, right_speed: int, left_speed: int):
 
         self.wait_for_arduino()
 
@@ -54,6 +54,7 @@ class Zomby:
 
         if DEBUG:
             print("send speed ")
+
         # send right motor ID to arduino
         self.__serial_port.write(self.__ser_ID_right)
 
