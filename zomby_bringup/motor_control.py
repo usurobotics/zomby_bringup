@@ -34,8 +34,12 @@ class MotorControl(Node):
 
         cmd = np.array([[msg.linear.x],
                         [msg.angular.z]])
-        m = (zomby_params.WHEEL_RADIUS/2) * np.array([[1,1],
-                                                      [1,-1]])
+        
+        r = zomby_params.WHEEL_RADIUS
+        l = zomby_params.WHEEL_DISTANCE
+
+        m = np.array([[r/2, r/2],
+                      [r/l, r/l]])
         
         m_inv = np.linalg.inv(m)
 
