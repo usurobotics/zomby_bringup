@@ -7,12 +7,26 @@ import zomby_bringup.params.zomby_params as zomby_params
 
 DEBUG = 1
 
+def map_range(value: float, in_min: float, in_max: float, out_min: float, out_max: float):
+    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+def saturate(value: float, max: float, min: float):
+    sat_value: float
+    if value > max:
+        sat_value = max
+    elif value < min:
+        sat_value = min
+    else:
+        sat_value = value
+
+    return sat_value
+
 class MotorControl(Node):
     def __init__(self):
         super().__init__(node_name="motor_control")
 
         self.zomby = Zomby(
-            port="COM6",
+            port="/dev/ttyACM1",
             baud_rate=115200
         )
 
@@ -39,23 +53,54 @@ class MotorControl(Node):
         l = zomby_params.WHEEL_DISTANCE
 
         m = np.array([[r/2, r/2],
-                      [r/l, r/l]])
+                      [r/l, -r/l]])
         
         m_inv = np.linalg.inv(m)
 
         wheel_veloc = m_inv@cmd
+        right_speed = wheel_veloc.item(0)
+        left_speed = wheel_veloc.item(1)
 
-        right_speed = int(wheel_veloc.item(0))
-        left_speed = int(wheel_veloc.item(1))
+        # Saturate to max velocities
+        right_speed_sat = saturate(
+            value=right_speed,
+            max=zomby_params.MAX_SPEED,
+            min=-zomby_params.MAX_SPEED
+        )
+        left_speed_sat = saturate(
+            value=left_speed,
+            max=zomby_params.MAX_SPEED,
+            min=-zomby_params.MAX_SPEED
+        )
+
+        # map to value usable by motor controllers
+        right_cmd = map_range(
+            value=right_speed_sat,
+            in_min=-zomby_params.MAX_SPEED,
+            in_max=zomby_params.MAX_SPEED,
+            out_min=0,
+            out_max=128
+        )
+        left_cmd = map_range(
+            value=left_speed_sat,
+            in_min=-zomby_params.MAX_SPEED,
+            in_max=zomby_params.MAX_SPEED,
+            out_min=0,
+            out_max=128
+        )
+
+        # cast to ints
+        right_cmd_int = int(right_cmd)
+        left_cmd_int = int(left_cmd)
 
         if DEBUG:
             print("Sending speeds:")
-            print("\tright: " + str(right_speed))
-            print("\tleft: " + str(left_speed))
+            print("\tright: " + str(right_cmd_int))
+            print("\tleft: " + str(left_cmd_int))
 
         self.zomby.setSpeed(
-            right_speed=right_speed,
-            left_speed=left_speed
+            right_speed=right_cmd_int,
+            left_speed=left_cmd_int
         )
 
 def main():
